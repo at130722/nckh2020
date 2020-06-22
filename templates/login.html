@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="../static/assets/css/loginstyle.css">
+  <link rel="icon" type="image/png" href="../static/assets/img/logo.png">
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="login">
+  <div class="login-triangle"></div>
+  
+  <h2 class="login-header">Login</h2>
+
+    <p><input type="text" placeholder="Username" id="username"></p>
+    <p><input type="password" placeholder="Password" id="password"></p>
+    <p style="color:gray;font-size:15px;cursor: pointer;text-decoration: underline" onclick="setting()">Setting</p>
+    <p><input type="submit" value="Login" onclick="login()"></p>
+    <p><div id="notify"></div></p>
+</div>
+
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script>
+
+  function getIP() {
+    $.ajax({
+            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classlify",
+            type: 'GET', // http method
+            success: function(data, status, xhr) {
+                console.log(data);
+                str = "<div class='alert alert-danger alert-dismissible fade show'>\
+                          <button type='button' aria-hidden='true' class='close' data-dismiss='alert' aria-label='Close'>\
+                            <i class='nc-icon nc-simple-remove'></i>\
+                          </button>\
+                          <span>\
+                            <b> Warning - </b> Có dữ liệu học sinh mới chưa được cập nhật!\
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-info' onclick='classlify()'>Update</button></span>\
+                        </div>";
+                if (data.resp==1) {
+                    document.getElementById("notify").innerHTML = str;
+                } else {
+                    document.getElementById("notify").innerHTML = "";
+                }
+
+            },
+            error: function(jqXhr, textStatus, errorMessage) {
+                $('p').append('Error: ' + errorMessage);
+            }
+        });
+  }
+
+  function login() {
+        document.getElementById("notify").innerHTML = "";
+        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/login";
+        var data = {};
+        data.username = document.getElementById("username").value;
+        data.password = document.getElementById("password").value;
+        console.log(data);
+
+        var json = JSON.stringify(data);
+        console.log(url)
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        xhr.onload = function() {
+            var resp = JSON.parse(xhr.responseText);
+            if (xhr.readyState == 4 && xhr.status == "200") {
+                console.log(resp);
+                if (resp.status==0) {
+                    sessionStorage.setItem("access_token", resp.access_token);
+                    window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000";
+                } else {
+                    document.getElementById("notify").innerHTML = "Thông tin đăng nhập không chính xác!!!";
+                }
+            } else {
+                document.getElementById("notify").innerHTML = "Đăng nhập thất bại!!!";
+            }
+        }
+        xhr.send(json);
+    }
+
+  function setting() {
+    let f = prompt('Enter Server IP here:');
+    let b = confirm('success!');
+    sessionStorage.setItem("server_ip", f);
+  }
+</script>
+</body>
+</html>

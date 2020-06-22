@@ -1,13 +1,24 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_restful import Resource, Api
 
-from function.diemdanh.diem_danh_api import DiemDanhAPI
+from function.attendance.attendance_api import AttendanceAPI
 
 app = Flask(__name__)
 api = Api(app)
 
+@app.route('/')
+def index():
+	return render_template('index.html')
 
-api.add_resource(DiemDanhAPI, '/api/diemdanh', methods = ['GET', 'POST'])
+@app.route('/attendance')
+def attendance():
+	return render_template('attendance.html')
+
+@app.route('/attendance_info')
+def attendance_info():
+	return render_template('attendance_info.html')
+
+api.add_resource(AttendanceAPI, '/api/attendance', methods = ['GET', 'POST'])
 
 
 if __name__ == '__main__':

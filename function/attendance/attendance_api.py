@@ -9,7 +9,7 @@ from libraries.general import standardizedData
 
 Session = ConnectToDB()
 
-class DiemDanhAPI(Resource):
+class AttendanceAPI(Resource):
 
 	def get(self):
 		try:
@@ -55,7 +55,7 @@ class DiemDanhAPI(Resource):
 			print (exp)
 			return False
 
-class DiemDanhOneAPI(Resource):
+class AttendanceOneAPI(Resource):
 
 	def get(self, dd_id):
 		try:
