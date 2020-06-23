@@ -5,8 +5,6 @@ from sqlalchemy import *
 
 Base = declarative_base()
 
-
-# khoi tao ket noi vao co so du lieu
 def ConnectToDB():
 	engine = create_engine('mysql+mysqldb://nckh:123456Aa!@127.0.0.1/nckh?charset=utf8')
 	Session = sessionmaker(bind=engine)
@@ -19,11 +17,22 @@ class Student(Base):
 	id = Column(String, primary_key=True)
 	name = Column(String)
 
+	attendance = relationship('Attendance', uselist=False, back_populates="student")
+
+
 class Attendance(Base):
 	__tablename__ = 'attendance'
 
-
 	id = Column(Integer, primary_key=True)
-	student_id = Column(String)
+	student_id = Column(String, ForeignKey('student.id'))
 	time = Column(String)
 	path = Column(String)
+	status = Column(Integer)
+
+	student = relationship("Student", back_populates="attendance")
+
+class AttendanceCount(Base):
+	__tablename__ = 'attendance_count'
+
+	id = Column(Integer, primary_key=True)
+	time = Column(String)
