@@ -22,7 +22,7 @@ class AttendanceAPI(Resource):
 				for search_value in search_values:
 					query = query.filter(or_(key.like('%'+ search_value +'%')\
 						for key in Attendance.__table__.columns))
-			records = query.all()
+			records = query.order_by(Attendance.time).all()
 			for i in range(len(records)):
 				name = records[i].student.name
 				records[i] = standardizedData(records[i], ['student'])
@@ -46,7 +46,6 @@ class AttendanceAPI(Resource):
 			raise (exp)
 			return False 
 
-	# Diem danh trong cung 1 ngay - xoa ban ghi cu ghi de du lieu moi !!!!!!!!!
 	def post(self):
 		try:
 			session = Session()
@@ -59,17 +58,21 @@ class AttendanceAPI(Resource):
 			current_time = datetime.now()
 			request_data = request.json['data']
 			print (request_data)
+			existed_record = session.query(Attendance).\
+				filter(Attendance.time.like('%'+ str(current_time).split(" ")[0] +'%')).all()
+			student_attendanced = []
+			for record in existed_record:
+				student_attendanced.append(record.student_id)
 			for data in request_data:
-				at_info = Attendance(
-					student_id = data['mssv'],
-					time = current_time,
-					path = data['path'],
-					status = 1
-				)
-				session.add(at_info)
-				print ("remove", data['mssv'])
+				if data['mssv'] not in student_attendanced:
+					at_info = Attendance(
+						student_id = data['mssv'],
+						time = current_time,
+						path = data['path'],
+						status = 1
+					)
+					session.add(at_info)
 				student_list.remove(data['mssv'])
-			print ("student_list", student_list)
 			for student in student_list:
 				at_info = Attendance(
 					student_id = student,

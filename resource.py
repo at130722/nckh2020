@@ -2,8 +2,8 @@ from flask import Flask, render_template
 from flask_restful import Resource, Api
 
 from function.attendance.attendance_api import AttendanceAPI, DownloadListAPI
-from function.attendance_count.attendance_count_api import AttendanceCountAPI
 from function.student_manager.student_manager_api import StudentAPI
+from function.start_attendance.start_attendance_api import StartAttendanceAPI
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,7 +22,7 @@ def attendance_info():
 
 api.add_resource(AttendanceAPI, '/api/attendance', methods = ['GET', 'POST'])
 api.add_resource(DownloadListAPI, '/api/attendance/download', methods=['GET'])
-api.add_resource(AttendanceCountAPI, '/api/attendance_count', methods=['GET'])
+api.add_resource(StartAttendanceAPI, '/api/start_attendance', methods=['POST'])
 api.add_resource(StudentAPI, '/api/student', methods=['GET'])
 
 

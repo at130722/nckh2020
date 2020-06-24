@@ -46,9 +46,6 @@
                 </a>
                 <a href="/" class="simple-text logo-normal">
           KMAS
-          <!-- <div class="logo-image-big">
-            <img src="../assets/img/logo-big.png">
-          </div> -->
         </a>
             </div>
             <div class="sidebar-wrapper">
@@ -60,13 +57,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="./class_manager">
+                        <a href="./attendance">
                             <i class="nc-icon nc-ruler-pencil"></i>
                             <p>Attendance</p>
                         </a>
                     </li>
                     <li>
-                        <a href="./student_manager">
+                        <a href="./attendance_info">
                             <i class="nc-icon nc-single-02"></i>
                             <p>Attendance List</p>
                         </a>
@@ -137,7 +134,7 @@
                                             </div>
                                           </div>
                                           <div class="file-upload-content">
-                                            <img class="file-upload-image" src="#" alt="your image" />
+                                            <img class="file-upload-image" id="img_upload" src="#" alt="your image" />
                                             <div class="image-title-wrap">
                                               <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
                                             </div>
@@ -149,7 +146,7 @@
 
                                 <div class="text-right">
                                     <div class="update ml-auto mr-auto">
-                                        <button type="button" class="btn btn-primary btn-round" id="add_Class" onclick="_attendance()">Bắt đầu điểm danh</button>
+                                        <button type="button" class="btn btn-primary btn-round" id="add_Class" onclick="start_attendance()">Start Attendance</button>
                                         <br />
                                     </div>
                                 </div>
@@ -164,6 +161,7 @@
                     </div>
                 </div>
                 <div id="loader"></div>
+                <div id="result"></div>
                 <br />
 
             </div>
@@ -171,12 +169,6 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="credits ml-auto">
-                            <span class="copyright">
-                <div onclick="location.href='http://neik.me';" style="cursor: pointer;">©
-                <script>
-                  document.write(new Date().getFullYear())
-                </script>, made by NeiK - AT13_HVKTMM</div>
-              </span>
                         </div>
                     </div>
                 </div>
@@ -205,367 +197,44 @@
 </body>
 
 <script>
-    function logout() {
-        sessionStorage.setItem("access_token", "");
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/logout";
-        console.log(url)
+
+    function start_attendance() {
+        url = "http://192.168.254.134:3000/api/start_attendance"
+        image = document.getElementById("img_upload").src;
+        data = JSON.stringify({
+            "data": image
+        });
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        // xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
         xhr.onload = function() {
             var resp = JSON.parse(xhr.responseText);
             if (xhr.readyState == 4 && xhr.status == "200") {
                 console.log(resp);
-                window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-            }
+                str = "<div class='row'>\
+                    <div class='col-md-12'>\
+                        <div class='card '>\
+                            <div class='card-header '>\
+                                <h5 class='card-title'>Attendance Result</h5>\
+                            </div>\
+                            <div class='card-body '>\
+                                <div class='text-right'>";
+                                str += "<img src='" + resp + "' alt='Attendance Result' width='100%' height='100%'>";
+                                str += "</div>\
+                            </div>\
+                            <div class='card-footer '>\
+                                <hr>\
+                                <div class='stats'>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>";
+                document.getElementById("result").innerHTML = str;
+            }  
         }
-        xhr.send();
-    }
-    function loaded() {
-        document.getElementById("loader").innerHTML = "";
-
-    }
-
-    window.onload = load_table();
-
-    function load_table() {
-
-
-var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/checkpoint";
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                if(resp.status==1){
-                    window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-                    console.log("1");
-                } 
-            } else {
-                    window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-                }   
-        }
-        xhr.send();
-
-
-        at_table();
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/0",
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                $.ajax({
-                    url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/" + data[0].id,
-                    type: 'GET', // http method
-                    success: function(data, status, xhr) {
-                        console.log(data);
-                        sessionStorage.setItem("class_id", data[0].id);
-                        sessionStorage.setItem("class_ip", data[0].ip);
-                        str = "<i class='fa fa-history' href=''></i> IP: " + data[0].ip;
-                        _str = "<div class='embed-responsive embed-responsive-16by9'>\
-  <iframe class='embed-responsive-item' src='http://" + data[0].ip + ":8080/video'></iframe>\
-</div>";
-                        document.getElementById("Class_ip").innerHTML = str;
-                    },
-                    error: function(jqXhr, textStatus, errorMessage) {
-                        $('p').append('Error: ' + errorMessage);
-                    }
-                });
-                str = "<select class='form-control' id='cl' onchange='select_cl()'><option disabled>--Class--</option>";
-                for (var i = 0; i < data.length; i++) {
-                    console.log(data[i].id)
-                    str += "<option value='" + data[i].id + "'>" + data[i].name + "</option>";
-                }
-                document.getElementById("Class_table").innerHTML = str;
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classview/" + sessionStorage.getItem("class_id"),
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                str = "<table class='table' style='overflow:hidden;'>\
-                    <thead class='text-primary'>\
-                      <th>\
-                        Stt\
-                      </th>\
-                      <th>\
-                        Họ tên\
-                      </th>\
-                      <th>\
-                        Số buổi nghỉ\
-                      </th>\
-                      <th>\
-                        Trạng thái\
-                      </th>\
-                      <th>\
-                        Image\
-                      </th>\
-                      <th class='text-right'>\
-                        Tùy chọn\
-                      </th>\
-                    </thead>\
-                    <tbody>";
-                for (var i = 0; i < data.length; i++) {
-                    console.log(data[i].id)
-                    var _status = ["Bình thường", "Chưa có dữ liệu ảnh", "Dữ liệu chưa phân lớp"];
-                    str += "<tr>\
-                        <td>\
-                        " + (i + 1) + "\
-                        </td>\
-                        <td>\
-                          " + data[i].name + "\
-                        </td>\
-                        <td>\
-                          " + data[i].num + "\
-                        </td>\
-                        <td>\
-                          <div id='student_stt" + data[i].student_id + "'></div>\
-                        </td>\
-                        <td>\
-                          <div class='zoom'><img src='/static/at_img/"+ data[i].id +".jpg' width='128px' height='72px'></div>\
-                        </td>\
-                        <td class='text-right'>\
-                          <div id='btdd" + data[i].student_id + "'><button class='btn btn-warning' onclick='manual_at(" + data[i].id + ")'>Điểm danh</button></div>\
-                        </td>\
-                      </tr>";
-                }
-
-                str += "</tbody>\
-                  </table><div class='text-right'><div class='update ml-auto mr-auto'><button type='button' class='btn btn-primary btn-round' onclick='_save()'>Lưu lại</button></div></div>";
-
-                document.getElementById("student_table").innerHTML = str;
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-
-        setInterval(function() {
-            $.ajax({
-                url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance/" + sessionStorage.getItem("class_id"),
-                type: 'GET', // http method
-                success: function(data, status, xhr) {
-                    console.log(data);
-
-                    for (var i = 0; i < data.length; i++) {
-                        console.log(data[i].id)
-                        document.getElementById("student_stt" + data[i].id + "").innerHTML = "Đã điểm danh!";
-                        document.getElementById("btdd" + data[i].id + "").innerHTML = "<button class='btn btn-danger' onclick='del_at(" + data[i].id + ")'>Hủy điểm danh</button>";
-                    }
-
-                },
-                error: function(jqXhr, textStatus, errorMessage) {
-                    $('p').append('Error: ' + errorMessage);
-                }
-            });
-        }, 1000);
-
-    }
-
-    function select_cl() {
-        var cl = document.getElementById("cl").value;
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/" + cl,
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                sessionStorage.setItem("class_id", data[0].id);
-                sessionStorage.setItem("class_ip", data[0].ip);
-
-                str = "<i class='fa fa-history' href=''></i> IP: " + data[0].ip;
-
-                document.getElementById("Class_ip").innerHTML = str;
-                reload_table();
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-    }
-
-    function del_at(std_id) {
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance";
-        var data = {};
-        data.std_id = std_id;
-        data.class_id = sessionStorage.getItem("class_id");
-        data.mode = 0;
-        console.log(data);
-
-        var json = JSON.stringify(data);
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("PUT", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                reload_table();
-            }
-        }
-        xhr.send(json);
-    }
-
-    function _attendance() {
-        reload_table();
-        console.log("Loading...");
-        loader();
-        // str = "<div align='center'><img src='./static/img/loader2.gif'></div>";
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance";
-        var data = {};
-        data.time = document.getElementById("time").value;
-        data.class = sessionStorage.getItem("class_id");
-        data.ip = sessionStorage.getItem("class_ip");
-        console.log(data);
-
-        var json = JSON.stringify(data);
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                loaded();
-                document.getElementById("loader").innerHTML = "";
-            }
-        }
-        xhr.send(json);
-    }
-
-    function reload_table() {
-        at_table();
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classview/" + sessionStorage.getItem("class_id"),
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                str = "<table class='table' style='overflow:hidden;'>\
-                    <thead class='text-primary'>\
-                      <th>\
-                        Stt\
-                      </th>\
-                      <th>\
-                        Họ tên\
-                      </th>\
-                      <th>\
-                        Số buổi nghỉ\
-                      </th>\
-                      <th>\
-                        Trạng thái\
-                      </th>\
-                      <th>\
-                        Image\
-                      </th>\
-                      <th class='text-right'>\
-                        Tùy chọn\
-                      </th>\
-                    </thead>\
-                    <tbody>";
-                for (var i = 0; i < data.length; i++) {
-                    console.log(data[i].id)
-                    str += "<tr>\
-                        <td>\
-                        " + (i + 1) + "\
-                        </td>\
-                        <td>\
-                          " + data[i].name + "\
-                        </td>\
-                        <td>\
-                          " + data[i].num + "\
-                        </td>\
-                        <td>\
-                          <div id='student_stt" + data[i].student_id + "'></div>\
-                        </td>\
-                        <td>\
-                          <div class='zoom'><img src='/static/at_img/"+ data[i].id +".jpg' width='128px' height='72px'></div>\
-                        </td>\
-                        <td class='text-right'>\
-                          <div id='btdd" + data[i].student_id + "'><button class='btn btn-warning' onclick='manual_at(" + data[i].id + ")'>Điểm danh</button></div>\
-                        </td>\
-                      </tr>";
-                }
-
-                str += "</tbody>\
-                  </table><div class='text-right'><div class='update ml-auto mr-auto'><button type='button' class='btn btn-primary btn-round' onclick='_save()'>Lưu lại</button></div></div>";
-
-                document.getElementById("student_table").innerHTML = str;
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-    }
-
-    function _save() {
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance/" + sessionStorage.getItem("class_id");
-
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("DELETE", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                reload_table();
-            }
-        }
-        xhr.send();
-    }
-
-    function manual_at(std_id) {
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance";
-        var data = {};
-        data.std_id = std_id;
-        data.mode = 1;
-        console.log(data);
-
-        var json = JSON.stringify(data);
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("PUT", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                reload_table();
-            }
-        }
-        xhr.send(json);
-    }
-
-    function loader() {
-
-        var time = document.getElementById("time").value;
-        var i = 0;
-        var s = setInterval(function() {
-            console.log("Loader..." + (i / (time + 10)) * 100);
-
-            str = "Attendancing...<div class='col-md-12'><div class='progress'>\
-        <div class='progress-bar bg-info' style='width:" + (i / (+time + +10)) * 100 + "%' width='80%'></div>\
-        </div></div>";
-            i++;
-            if (i > (+time) + +10) {
-                clearInterval(s);
-            }
-            document.getElementById("loader").innerHTML = str;
-        }, 1000);
+        xhr.send(data);
     }
 
     function at_table() {
@@ -600,39 +269,6 @@ var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/checkpoint"
                 $('p').append('Error: ' + errorMessage);
             }
         });
-
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classview/" + sessionStorage.getItem("class_id"),
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                for (var i = 0; i < data.length; i++) {
-                    sessionStorage.setItem("temp", i);
-                    document.getElementById("name" + i).innerHTML = data[i].name;
-
-                    var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/timetable/" + data[i].id;
-                    console.log(url)
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("PUT", url, false);
-                    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-                    xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-                    xhr.onload = function() {
-                        var resp = JSON.parse(xhr.responseText);
-                        if (xhr.readyState == 4 && xhr.status == "200") {
-                            console.log(resp);
-                            for (var j = 0; j < resp.length; j++) {
-                                console.log(i + "_" + resp[j].session_learned);
-                                document.getElementById(i + "_" + resp[j].session_learned).innerHTML = "<div title='Thời gian đến: "+resp[j].time+"' style='background-color:lightblue' align='center'>Đã điểm danh!</div>";
-                            }
-                        }
-                    }
-                    xhr.send();
-                }
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-            $('p').append('Error: ' + errorMessage);
-        }
-    });
 }
 </script>
 

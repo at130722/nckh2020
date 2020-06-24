@@ -49,13 +49,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="./class_manager">
+                        <a href="./attendance">
                             <i class="nc-icon nc-ruler-pencil"></i>
                             <p>Attendance</p>
                         </a>
                     </li>
                     <li>
-                        <a href="./student_manager">
+                        <a href="./attendance_info">
                             <i class="nc-icon nc-single-02"></i>
                             <p>Attendance List</p>
                         </a>
@@ -111,7 +111,7 @@
                         <div id='notify'></div>
                         <div class="card ">
                             <div class="card-header ">
-                                <h5 class="card-title">View Camera</h5>
+                                <h5 class="card-title">Introduct</h5>
                                 <!-- <p class="card-category">IP Address: 127.0.0.1</p> -->
                             </div>
                             <div class="card-body ">
@@ -166,209 +166,5 @@
         });
     </script>
 </body>
-
-<script>
-
-    window.onload = load_table();
-
-    function load_table() {
-
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/checkpoint";
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                if(resp.status==1){
-                    window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-                    console.log("1");
-                } 
-            } else {
-                    window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-                }   
-        }
-        xhr.send();
-
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classlify",
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                str = "<div class='alert alert-danger alert-dismissible fade show'>\
-                          <button type='button' aria-hidden='true' class='close' data-dismiss='alert' aria-label='Close'>\
-                            <i class='nc-icon nc-simple-remove'></i>\
-                          </button>\
-                          <span>\
-                            <b> Warning - </b> Có dữ liệu học sinh mới chưa được cập nhật!\
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class='btn btn-info' onclick='classlify()'>Update</button></span>\
-                        </div>";
-                if (data.resp==1) {
-                    document.getElementById("notify").innerHTML = str;
-                } else {
-                    document.getElementById("notify").innerHTML = "";
-                }
-
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/0",
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                $.ajax({
-                    url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/" + data[0].id,
-                    type: 'GET', // http method
-                    success: function(data, status, xhr) {
-                        console.log(data);
-                        sessionStorage.setItem("class_id", data[0].id);
-                        str = "<i class='fa fa-history' href=''></i> IP: " + data[0].ip;
-                        _str = "<div class='embed-responsive embed-responsive-16by9'>\
-  <iframe class='embed-responsive-item' src='http://" + data[0].ip + ":8080/video'></iframe>\
-</div>";
-                        document.getElementById("cmr_frame").innerHTML = _str;
-                        document.getElementById("Class_ip").innerHTML = str;
-                    },
-                    error: function(jqXhr, textStatus, errorMessage) {
-                        $('p').append('Error: ' + errorMessage);
-                    }
-                });
-                str = "<select class='form-control' id='cl' onchange='select_cl()'><option disabled>--Class--</option>";
-                for (var i = 0; i < data.length; i++) {
-                    console.log(data[i].id)
-                    str += "<option value='" + data[i].id + "'>" + data[i].name + "</option>";
-                }
-                document.getElementById("Class_table").innerHTML = str;
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-
-
-
-    }
-
-    function select_cl() {
-        var cl = document.getElementById("cl").value;
-        $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/" + cl,
-            type: 'GET', // http method
-            success: function(data, status, xhr) {
-                console.log(data);
-                sessionStorage.setItem("class_id", data[0].id);
-                str = "<i class='fa fa-history' href=''></i> IP: " + data[0].ip;
-                document.getElementById("Class_ip").innerHTML = str;
-                document.getElementById("cmr_frame").innerHTML = "<iframe src='http://" + data[0].ip + ":8080/video' height='1080px' width='100%'></iframe>";
-
-            },
-            error: function(jqXhr, textStatus, errorMessage) {
-                $('p').append('Error: ' + errorMessage);
-            }
-        });
-    }
-
-
-    function logout() {
-        sessionStorage.setItem("access_token", "");
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/logout";
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-            }
-        }
-        xhr.send();
-    }
-
-    function delete_std(id, name) {
-        console.log("Delete " + id);
-
-        if (confirm('Bạn có chắc muốn xóa ' + name + " khỏi danh sách lớp?")) {
-            var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class";
-            var data = {};
-            data.id = id;
-            console.log(data);
-
-            var json = JSON.stringify(data);
-            console.log(url)
-            var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", url, true);
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-            xhr.onload = function() {
-                var resp = JSON.parse(xhr.responseText);
-                if (xhr.readyState == 4 && xhr.status == "200") {
-                    console.log(resp);
-                    load_table()
-                }
-            }
-            xhr.send(json);
-        } else {
-            // Do nothing!
-        }
-
-    }
-
-    function add() {
-        console.log("add class!!!");
-
-        var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class";
-        var data = {};
-        data.class_name = document.getElementById("class_name").value;
-        data.session_num = document.getElementById("session_num").value;
-        data.ip = document.getElementById("ip").value;
-        data.access_token = sessionStorage.getItem("access_token");
-        console.log(data);
-
-        var json = JSON.stringify(data);
-        console.log(url)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                load_table()
-            }
-        }
-        xhr.send(json);
-    }
-
-function classlify() {
-    var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classlify";
-        console.log(url)
-
-        var data = {};
-        var json = JSON.stringify(data);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        xhr.onload = function() {
-            var resp = JSON.parse(xhr.responseText);
-            if (xhr.readyState == 4 && xhr.status == "200") {
-                console.log(resp);
-                load_table();
-            }
-        }
-        xhr.send(json);
-}
-</script>
 
 </html>

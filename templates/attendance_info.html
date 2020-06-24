@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="../static/assets/img/logo.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-        KMA Auto Attendance System
+        Điểm danh tự động - NCKH 2020
     </title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
@@ -59,27 +59,15 @@
                         </a>
                     </li>
                     <li>
-                        <a href="./class_manager">
-                            <i class="nc-icon nc-ruler-pencil"></i>
-                            <p>Class Manager</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="./student_manager">
-                            <i class="nc-icon nc-single-02"></i>
-                            <p>Student Manager</p>
-                        </a>
-                    </li>
-                    <li>
                         <a href="./attendance">
-                            <i class="nc-icon nc-book-bookmark"></i>
+                            <i class="nc-icon nc-ruler-pencil"></i>
                             <p>Attendance</p>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
-                            <i class="nc-icon nc-tile-56"></i>
-                            <p>Scheduling</p>
+                        <a href="./attendance_info">
+                            <i class="nc-icon nc-single-02"></i>
+                            <p>Attendance List</p>
                         </a>
                     </li>
                 </ul>
@@ -364,235 +352,19 @@
             }
         });
     }
-    // function logout() {
-    //     sessionStorage.setItem("access_token", "");
-    //     var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/logout";
-    //     console.log(url)
-    //     var xhr = new XMLHttpRequest();
-    //     xhr.open("POST", url, true);
-    //     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    //     xhr.onload = function() {
-    //         var resp = JSON.parse(xhr.responseText);
-    //         if (xhr.readyState == 4 && xhr.status == "200") {
-    //             console.log(resp);
-    //             window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-    //         }
-    //     }
-    //     xhr.send();
-    // }
 
-    
-
-    // function load_table() {
-
-
-        // var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/checkpoint";
-        // console.log(url)
-        // var xhr = new XMLHttpRequest();
-        // xhr.open("POST", url, true);
-        // xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        // xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-        // xhr.onload = function() {
-        //     var resp = JSON.parse(xhr.responseText);
-        //     if (xhr.readyState == 4 && xhr.status == "200") {
-        //         console.log(resp);
-        //         if(resp.status==1){
-        //             window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-        //             console.log("1");
-        //         } 
-        //     } else {
-        //             window.location.href = "http://"+ sessionStorage.getItem("server_ip") +":5000/login";
-        //         }   
-        // }
-        // xhr.send();
-
-
-//         at_table();
-//         $.ajax({
-//             url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/0",
-//             type: 'GET', // http method
-//             success: function(data, status, xhr) {
-//                 console.log(data);
-//                 $.ajax({
-//                     url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/_class/" + data[0].id,
-//                     type: 'GET', // http method
-//                     success: function(data, status, xhr) {
-//                         console.log(data);
-//                         sessionStorage.setItem("class_id", data[0].id);
-//                         sessionStorage.setItem("class_ip", data[0].ip);
-//                         str = "<i class='fa fa-history' href=''></i> IP: " + data[0].ip;
-//                         _str = "<div class='embed-responsive embed-responsive-16by9'>\
-//   <iframe class='embed-responsive-item' src='http://" + data[0].ip + ":8080/video'></iframe>\
-// </div>";
-//                         document.getElementById("Class_ip").innerHTML = str;
-//                     },
-//                     error: function(jqXhr, textStatus, errorMessage) {
-//                         $('p').append('Error: ' + errorMessage);
-//                     }
-//                 });
-//                 str = "<select class='form-control' id='cl' onchange='select_cl()'><option disabled>--Class--</option>";
-//                 for (var i = 0; i < data.length; i++) {
-//                     console.log(data[i].id)
-//                     str += "<option value='" + data[i].id + "'>" + data[i].name + "</option>";
-//                 }
-//                 document.getElementById("Class_table").innerHTML = str;
-//             },
-//             error: function(jqXhr, textStatus, errorMessage) {
-//                 $('p').append('Error: ' + errorMessage);
-//             }
-//         });
-
-//         $.ajax({
-//             url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classview/" + sessionStorage.getItem("class_id"),
-//             type: 'GET', // http method
-//             success: function(data, status, xhr) {
-//                 console.log(data);
-//                 str = "<table class='table' style='overflow:hidden;'>\
-//                     <thead class='text-primary'>\
-//                       <th>\
-//                         Stt\
-//                       </th>\
-//                       <th>\
-//                         Họ tên\
-//                       </th>\
-//                       <th>\
-//                         Số buổi nghỉ\
-//                       </th>\
-//                       <th>\
-//                         Trạng thái\
-//                       </th>\
-//                       <th>\
-//                         Image\
-//                       </th>\
-//                       <th class='text-right'>\
-//                         Tùy chọn\
-//                       </th>\
-//                     </thead>\
-//                     <tbody>";
-//                 for (var i = 0; i < data.length; i++) {
-//                     console.log(data[i].id)
-//                     var _status = ["Bình thường", "Chưa có dữ liệu ảnh", "Dữ liệu chưa phân lớp"];
-//                     str += "<tr>\
-//                         <td>\
-//                         " + (i + 1) + "\
-//                         </td>\
-//                         <td>\
-//                           " + data[i].name + "\
-//                         </td>\
-//                         <td>\
-//                           " + data[i].num + "\
-//                         </td>\
-//                         <td>\
-//                           <div id='student_stt" + data[i].student_id + "'></div>\
-//                         </td>\
-//                         <td>\
-//                           <div class='zoom'><img src='/static/at_img/"+ data[i].id +".jpg' width='128px' height='72px'></div>\
-//                         </td>\
-//                         <td class='text-right'>\
-//                           <div id='btdd" + data[i].student_id + "'><button class='btn btn-warning' onclick='manual_at(" + data[i].id + ")'>Điểm danh</button></div>\
-//                         </td>\
-//                       </tr>";
-//                 }
-
-//                 str += "</tbody>\
-//                   </table><div class='text-right'><div class='update ml-auto mr-auto'><button type='button' class='btn btn-primary btn-round' onclick='_save()'>Lưu lại</button></div></div>";
-
-//                 document.getElementById("student_table").innerHTML = str;
-//             },
-//             error: function(jqXhr, textStatus, errorMessage) {
-//                 $('p').append('Error: ' + errorMessage);
-//             }
-//         });
-
-//         setInterval(function() {
-//             $.ajax({
-//                 url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/attendance/" + sessionStorage.getItem("class_id"),
-//                 type: 'GET', // http method
-//                 success: function(data, status, xhr) {
-//                     console.log(data);
-
-//                     for (var i = 0; i < data.length; i++) {
-//                         console.log(data[i].id)
-//                         document.getElementById("student_stt" + data[i].id + "").innerHTML = "Đã điểm danh!";
-//                         document.getElementById("btdd" + data[i].id + "").innerHTML = "<button class='btn btn-danger' onclick='del_at(" + data[i].id + ")'>Hủy điểm danh</button>";
-//                     }
-
-//                 },
-//                 error: function(jqXhr, textStatus, errorMessage) {
-//                     $('p').append('Error: ' + errorMessage);
-//                 }
-//             });
-//         }, 1000);
-
-//     }
-    
-
-    function at_table() {
-        console.log("at_table");
+    function download() {
         $.ajax({
-            url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/timetable/" + sessionStorage.getItem("class_id"),
-            type: 'GET', // http method
+            url: "http://192.168.254.134:3000/api/attendance/download",
+            type: 'GET',
             success: function(data, status, xhr) {
                 console.log(data);
-                str = "<table class='table-responsive' border='1' bordercolor=gray>\
-                    <thead class='text-primary'><th width='15%'>Student/Time</th>";
-                for (var i = 0; i < data.length; i++) {
-                    str += "<th width='150px'>" + data[i].time + "</th>";
-                }
-                str += "</thead><tbody>"
-                for (var j = 0; j < data[0].student_number; j++) {
-                    str += "<tr>";
-                    for (var k = 0; k < data.length + 1; k++) {
-                        if (k == 0) {
-                            str += "<td><b><div id='name" + j + "' style='color:#51cbce;'>Name</div></b></td>";
-                        } else {
-                            str += "<td><div id='" + j + "_" + k + "' style='background-color:orange' align='center'>X</div></td>"
-                        }
-                    }
-                    str += "</tr>";
-                }
-
-                str += "</tbody>";
-                document.getElementById("at_table").innerHTML = str;
             },
             error: function(jqXhr, textStatus, errorMessage) {
                 $('p').append('Error: ' + errorMessage);
             }
         });
-
-    //     $.ajax({
-    //         url: "http://"+ sessionStorage.getItem("server_ip") +":5000/api/classview/" + sessionStorage.getItem("class_id"),
-    //         type: 'GET', // http method
-    //         success: function(data, status, xhr) {
-    //             console.log(data);
-    //             for (var i = 0; i < data.length; i++) {
-    //                 sessionStorage.setItem("temp", i);
-    //                 document.getElementById("name" + i).innerHTML = data[i].name;
-
-    //                 var url = "http://"+ sessionStorage.getItem("server_ip") +":5000/api/timetable/" + data[i].id;
-    //                 console.log(url)
-    //                 var xhr = new XMLHttpRequest();
-    //                 xhr.open("PUT", url, false);
-    //                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    //                 xhr.setRequestHeader("Authorization", "Bearer " + sessionStorage.getItem("access_token"));
-    //                 xhr.onload = function() {
-    //                     var resp = JSON.parse(xhr.responseText);
-    //                     if (xhr.readyState == 4 && xhr.status == "200") {
-    //                         console.log(resp);
-    //                         for (var j = 0; j < resp.length; j++) {
-    //                             console.log(i + "_" + resp[j].session_learned);
-    //                             document.getElementById(i + "_" + resp[j].session_learned).innerHTML = "<div title='Thời gian đến: "+resp[j].time+"' style='background-color:lightblue' align='center'>Đã điểm danh!</div>";
-    //                         }
-    //                     }
-    //                 }
-    //                 xhr.send();
-    //             }
-    //         },
-    //         error: function(jqXhr, textStatus, errorMessage) {
-    //         $('p').append('Error: ' + errorMessage);
-    //     }
-    // });
-}
+    }
 </script>
 
 </html>
